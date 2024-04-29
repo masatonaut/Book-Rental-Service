@@ -24,8 +24,11 @@
                     <x-nav-link :href="route('librarian.deleted-genre.index')" :active="request()->routeIs('librarian.dashboard')">
                         Deleted Genres
                     </x-nav-link>
-                    <x-nav-link :href="route('librarian.dashboard')" :active="request()->routeIs('librarian.dashboard')">
+                    <x-nav-link :href="route('librarian.books.create')" :active="request()->routeIs('librarian.dashboard')">
                         Add New Book
+                    </x-nav-link>
+                    <x-nav-link :href="route('librarian.deleted-book.index')" :active="request()->routeIs('librarian.dashboard')">
+                        Deleted Books
                     </x-nav-link>
                 </div>
             </div>

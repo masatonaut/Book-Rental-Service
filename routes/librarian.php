@@ -9,10 +9,12 @@ use App\Http\Controllers\Librarian\Auth\PasswordController;
 use App\Http\Controllers\Librarian\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Librarian\Auth\RegisteredUserController;
 use App\Http\Controllers\Librarian\Auth\VerifyEmailController;
+use App\Http\Controllers\Librarian\BooksController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Librarian\GenreController;
-
+use App\Http\Controllers\Librarian\LibrarianController;
+use App\Models\Book;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -77,9 +79,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth:librarian', 'verified'])->name('dashboard');
+Route::get('/dashboard', [LibrarianController::class, 'dashboard'])
+    ->middleware(['auth:librarian', 'verified'])->name('dashboard');
 
 Route::middleware('auth:librarian')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -89,10 +90,28 @@ Route::middleware('auth:librarian')->group(function () {
 
 Route::resource('genres', GenreController::class)->middleware('auth:librarian');
 
+Route::resource('books', BooksController::class)->middleware('auth:librarian');
+
 Route::prefix('deleted-genre')
 ->middleware('auth:librarian')
 ->group(function(){
     Route::get('/index', [GenreController::class, 'deletedGenreIndex'])->name('deleted-genre.index');
     Route::post('/destroy/{genre}', [GenreController::class, 'deletedGenreDestroy'])->name('deleted-genre.destroy');
     Route::post('/restore/{genre}', [GenreController::class, 'deletedGenreRestore'])->name('deleted-genre.restore');
+});
+
+Route::prefix('deleted-book')
+->middleware('auth:librarian')
+->group(function(){
+    Route::get('/index', [BooksController::class, 'deletedBookIndex'])->name('deleted-book.index');
+    Route::post('/destroy/{book}', [BooksController::class, 'deletedBookDestroy'])->name('deleted-book.destroy');
+    Route::post('/restore/{book}', [BooksController::class, 'deletedBookRestore'])->name('deleted-book.restore');
+});
+
+Route::prefix('books')
+->middleware('auth:librarian')
+->group(function(){
+    Route::get('/filteredByGenre/{genre}', [BooksController::class, 'filteredByGenre'])->name('books.filtered-by-genre');
+    Route::get('/filteredByTitle/{keyword}', [BooksController::class, 'filteredByTitle'])->name('books.filtered-by-title');
+    Route::get('/filteredByAuthors/{keyword}', [BooksController::class, 'filteredByAuthors'])->name('books.filtered-by-authors');
 });

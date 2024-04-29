@@ -14,9 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             LibrarianSeeder::class,
-            // UserSeeder::class,
-            // GenreSeeder::class,
-            // BookSeeder::class,
+            // ReaderSeeder::class,
+            GenreSeeder::class,
+            BookSeeder::class,
             // Book_genreSeeder::class,
             // BorrowSeeder::class
         ]);

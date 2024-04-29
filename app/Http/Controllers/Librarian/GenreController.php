@@ -97,4 +97,11 @@ class GenreController extends Controller
 
         return redirect()->route('librarian.deleted-genre.index');
     }
+
+    public function deletedGenreDestroy(string $id)
+    {
+        $genre = Genre::onlyTrashed()->findOrFail($id);
+        $genre->forceDelete();
+        return redirect()->route('librarian.deleted-genre.index');
+    }
 }
