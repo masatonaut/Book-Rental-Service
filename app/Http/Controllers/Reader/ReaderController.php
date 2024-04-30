@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Librarian;
+namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Reader;
 use App\Models\Genre;
-use App\Models\Borrow;
 use App\Models\Book;
+use App\Models\Borrow;
 
-class LibrarianController extends Controller
+class ReaderController extends Controller
 {
     public function dashboard()
     {
         $total_readers = Reader::all()->count();
         $total_books = Book::all()->count();
         $total_genres = Genre::all()->count();
-        $active_rent = Borrow::where('status', 'ACCEPTED')->count();
         $genres = Genre::all();
+        $active_rent = Borrow::where('status', 'ACCEPTED')->count();
 
         return view(
-            'librarian.dashboard',
+            'reader.dashboard',
             compact(
                 'total_readers',
                 'total_books',

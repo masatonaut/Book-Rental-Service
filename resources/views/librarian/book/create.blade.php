@@ -56,7 +56,18 @@
                     </label>
                     <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="in_stock" type="number" name="in_stock">
                 </div>
-
+                <div class="w-full md:w-1/2 px-3" bg-gray-500>
+                    <label class="flex block mb-2 text-sm font-medium text-gray-900" for="genres[]">Genre</label>
+                    {{-- <x-input-error :messages="$errors->get('genres[]')" class="mt-2" /> --}}
+                    <div class="flex flex-wrap mb-6 justify-center bg-white p-5 rounded">
+                      @foreach ($genres as $genre)
+                      <div class="flex items-center me-4">
+                          <input id="{{$genre->name}}" type="checkbox" value="{{$genre->id}}" name="genres[]" class="w-4 h-4">
+                          <label for="{{$genre->name}}" class="ms-2 text-sm font-medium text-gray-900">{{$genre->name}}</label>
+                      </div>
+                      @endforeach
+                    </div>
+                </div>
             </div>
 
             <div class="w-full px-3">
