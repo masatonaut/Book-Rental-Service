@@ -85,13 +85,15 @@ class GenreController extends Controller
         return redirect()->route('librarian.genres.index');
     }
 
-    public function deletedGenreIndex(){
-        $genres = Genre::onlyTrashed()->get();
+    public function deletedGenreIndex()
+    {
+        $genres = Genre::onlyTrashed()->paginate(5);
 
         return view('librarian.deletedGenre.index', compact('genres'));
     }
 
-    public function deletedGenreRestore(string $id){
+    public function deletedGenreRestore(string $id)
+    {
         $genre = Genre::onlyTrashed()->findOrFail($id);
         $genre->restore();
 

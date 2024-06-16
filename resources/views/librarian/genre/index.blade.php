@@ -38,5 +38,6 @@
                 @endforeach
             </tbody>
         </table>
+        {{$genres->links()}}
     </div>
 </x-app-layout>

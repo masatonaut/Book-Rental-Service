@@ -27,7 +27,7 @@ class BookRequest extends FormRequest
             "authors" => 'required|string|max:255',
             "description" => 'nullable',
             "released_at" => 'nullable|date_format:Y-m-d|before:now',
-            "cover_image" => 'nullable|max:255',
+            "cover_image" => 'nullable|max:2024',
             "pages" => 'nullable|integer|min:1',
             "language_code" => 'nullable|max:3|string',
             "isbn" => ['nullable', 'string', 'size:13', Rule::unique(Book::class)->ignore($this->route('book'))],

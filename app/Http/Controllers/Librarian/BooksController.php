@@ -161,7 +161,7 @@ class BooksController extends Controller
 
     public function deletedbookIndex()
     {
-        $books = Book::onlyTrashed()->get();
+        $books = Book::onlyTrashed()->paginate(5);
 
         return view('librarian.deletedBook.index', compact('books'));
     }
