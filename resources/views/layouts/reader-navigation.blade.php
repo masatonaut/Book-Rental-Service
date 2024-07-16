@@ -5,14 +5,14 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('reader.reader.dashboard') }}">
+                    <a href="{{ route('reader.dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('reader.reader.dashboard')" :active="request()->routeIs('reader.reader.dashboard')">
+                    <x-nav-link :href="route('reader.dashboard')" :active="request()->routeIs('reader.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
@@ -34,7 +34,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('reader.profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
@@ -80,7 +80,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="route('reader.profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 

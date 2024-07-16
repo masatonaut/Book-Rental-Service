@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\Librarian;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\Book_genre;
 use Illuminate\Http\Request;
+use App\Models\Borrow;
+use Illuminate\Support\Facades\Log;
+use PHPUnit\Event\Code\Throwable;
+use Illuminate\Support\Facades\DB;
 
 class BooksController extends Controller
 {
@@ -13,23 +19,26 @@ class BooksController extends Controller
      * Display a listing of the resource.
      */
 
-     public function filteredByTitle(String $keyword){
+    public function filteredByTitle(String $keyword)
+    {
         $books = Book::where('title', 'LIKE', '%' . $keyword . '%')->paginate(5);
-    
+
         return view('librarian.book.filtered-by-title', compact('keyword', 'books'));
     }
-    
-    public function filteredByAuthors(String $keyword){
+
+    public function filteredByAuthors(String $keyword)
+    {
         $books = Book::where('authors', 'LIKE', '%' . $keyword . '%')->paginate(5);
-    
+
         return view('librarian.book.filtered-by-authors', compact('keyword', 'books'));
     }
-    
-    
-    public function filteredByGenre(String $id){
+
+
+    public function filteredByGenre(String $id)
+    {
         $genre = Genre::findOrFail($id);
         $books = $genre->Books()->paginate(5);
-    
+
         return view('librarian.book.filtered-by-genre', compact('genre', 'books'));
     }
 
@@ -43,25 +52,42 @@ class BooksController extends Controller
      */
     public function create()
     {
-        return view('librarian.book.create');
+        $genres = Genre::all();
+        return view('librarian.book.create', compact('genres'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
-        Book::create([
-            'title' => $request->input('title'),
-            'authors' => $request->input('authors'),
-            'description' => $request->input('description'),
-            'released_at' => $request->input('released_at'),
-            'cover_image' => $request->input('cover_image'),
-            'pages' => $request->input('pages'),
-            'language_code' => $request->input('language_code'),
-            'isbn' => $request->input('isbn'),
-            'in_stock' => $request->input('in_stock')
-        ]);
+        try {
+            DB::transaction(function () use ($request) {
+                $book = Book::create([
+                    "title" => $request->title,
+                    "authors" => $request->authors,
+                    "description" => $request->description,
+                    "released_at" => $request->released_at,
+                    "cover_image" => $request->cover_image,
+                    "pages" => $request->pages,
+                    "language_code" =>  $request->language_code ?? "hu",
+                    "isbn" => $request->isbn,
+                    "in_stock" => $request->in_stock,
+                ]);
+
+                $genre_ids = $request->genres;
+
+                foreach ($genre_ids as $genre_id) {
+                    Book_genre::create([
+                        "book_id" => $book->id,
+                        "genre_id" => $genre_id
+                    ]);
+                }
+            });
+        } catch (Throwable $e) {
+            Log::error($e);
+            throw $e;
+        }
 
         return redirect()->route('librarian.dashboard');
     }
@@ -81,26 +107,44 @@ class BooksController extends Controller
     public function edit(string $id)
     {
         $book = Book::findOrFail($id);
-        return view("librarian.book.edit", compact('book'));
+        $genres = Genre::all();
+        $current_genres = [];
+        foreach ($book->Genres as $genre) {
+            $current_genres[] = $genre->id;
+        }
+        return view("librarian.book.edit", compact('book', 'genres', 'current_genres'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BookRequest $request, string $id)
     {
         $book = Book::findOrFail($id);
-        $book->title = $request->input('title');
-        $book->authors = $request->input('authors');
-        $book->description = $request->input('description');
-        $book->released_at = $request->input('released_at');
-        $book->cover_image = $request->input('cover_image');
-        $book->pages = $request->input('pages');
-        $book->language_code = $request->input('language_code');
-        $book->isbn = $request->input('isbn');
-        $book->in_stock = $request->input('in_stock');
 
+        $book->title = $request->title;
+        $book->authors = $request->authors;
+        $book->description = $request->description;
+        $book->released_at = $request->released_at;
+        $book->cover_image = $request->cover_image;
+        $book->pages = $request->pages;
+        $book->language_code = $request->language_code;
+        $book->isbn = $request->isbn;
+        $book->in_stock = $request->in_stock;
+
+        $Book_genres = Book_genre::where('book_id', $id)->get();
+        foreach ($Book_genres as $book_genre) {
+            $book_genre->delete();
+        }
+        $genre_ids = $request->genres;
+        foreach ($genre_ids as $genre_id) {
+            book_genre::create([
+                "book_id" => $book->id,
+                "genre_id" => $genre_id
+            ]);
+        }
         $book->save();
+
         return redirect()->route('librarian.books.show', $book->id);
     }
 
@@ -115,13 +159,15 @@ class BooksController extends Controller
         return redirect()->route('librarian.dashboard');
     }
 
-    public function deletedbookIndex(){
-        $books = Book::onlyTrashed()->get();
+    public function deletedbookIndex()
+    {
+        $books = Book::onlyTrashed()->paginate(5);
 
         return view('librarian.deletedBook.index', compact('books'));
     }
 
-    public function deletedbookRestore(string $id){
+    public function deletedbookRestore(string $id)
+    {
         $book = Book::onlyTrashed()->findOrFail($id);
         $book->restore();
 

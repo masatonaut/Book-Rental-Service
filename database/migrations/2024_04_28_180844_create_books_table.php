@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title', 255);
             $table->string('authors', 255);
             $table->text('description')->nullable();
-            $table->date('released_at');
+            $table->date('released_at')->nullable();
             $table->string('cover_image',255)->nullable();
             $table->integer('pages');
             $table->string('language_code',3)->default('hu');

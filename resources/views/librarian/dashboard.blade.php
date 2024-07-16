@@ -33,6 +33,17 @@
                         <button id="authors-search-button" type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search By Authors</button>
                     </div>
                 </form>
+                
+                <form id="genre-search-form" class="flex space-x-2 max-w-sm mx-auto" method="GET" action="">
+                    <select id="genre" name="genre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option >Select Genre</option>
+                    @foreach ($genres as $genre)
+                        <option value="{{$genre->id}}">{{$genre->name}}</option>
+                    @endforeach
+                    </select>
+                    <button id="authors-search-button" type="submit" class="w-60 text-white end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search By Genre</button>
+                </form>
+  
             </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 
@@ -66,7 +77,7 @@
                                     {{$total_genres}}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{0}}
+                                    {{$active_rent}}
                                 </td>
                             </tr>
                         </tbody>
@@ -80,9 +91,11 @@
 <script>
     titleSearchInput = document.querySelector('#title-search');
     authorsSearchInput = document.querySelector('#authors-search');
+    genreSearchOption = document.querySelector('#genre');
 
     titleSearchForm = document.querySelector('#title-search-form');
     authorsSearchForm = document.querySelector('#authors-search-form');
+    genreSearchForm = document.querySelector('#genre-search-form');
 
     titleSearchForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -104,5 +117,16 @@
         const authorsRoute = '{{ route("librarian.books.filtered-by-authors", ["keyword" => ":authorsKeyword"]) }}'
         authorsSearchForm.action = authorsRoute.replace(':authorsKeyword', authorsKeyword);
         authorsSearchForm.submit();
+    })
+
+    genreSearchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const genre_id = genreSearchOption.value;
+        if(genre_id == null){
+            return;
+        }
+        const genreRoute = '{{ route("librarian.books.filtered-by-genre", ["genre" => ":genre_id"]) }}'
+        genreSearchForm.action = genreRoute.replace(':genre_id', genre_id);
+        genreSearchForm.submit();
     })
 </script>
